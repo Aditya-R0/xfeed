@@ -7,7 +7,7 @@ import os
 
 OUTPUT_FILE = "tweets.json"
 PAGE_FETCH_DELAY = 3
-MAX_TWEETS = 40
+MAX_TWEETS = 100
 TWEETS_PER_PAGE = 20
 
 async def run_main(cookie_path):
