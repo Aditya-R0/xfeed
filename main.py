@@ -43,7 +43,7 @@ async def run_main(cookie_path):
             tweet_data.append({
                  "username": tweet.user.screen_name,
                  "name": tweet.user.name,
-                 "verified": tweet.user.verified,
+                 "verified": tweet.user.is_blue_verified,
                  "profile_image_url": profile_image_url,
                  "text": cleaned_text,
                  "tweet_id": getattr(tweet, "id", None),
