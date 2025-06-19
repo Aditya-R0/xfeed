@@ -20,7 +20,10 @@ async def run_main(cookie_path):
 
     while tweets and len(tweet_data) < MAX_TWEETS:
         for tweet in tweets:
+            user = tweet.user
             media_urls = []
+
+            # Handle media
             if tweet.media:
                 for media in tweet.media:
                     if media.type == "photo":
@@ -34,17 +37,23 @@ async def run_main(cookie_path):
                             if best.url:
                                 media_urls.append(best.url)
 
-            profile_image_url = getattr(tweet.user, "profile_image_url_https", None) or getattr(tweet.user, "profile_image_url", None)
+            profile_image_url = getattr(user, "profile_image_url_https", None) or getattr(user, "profile_image_url", None)
             cleaned_text = re.sub(r"https://t\.co/\w+", "", tweet.full_text).strip()
 
             tweet_data.append({
-                "username": tweet.user.screen_name,
-                "profile_image_url": profile_image_url,
-                "text": cleaned_text,
-                "tweet_id": getattr(tweet, "id", None),
-                "created_at": str(tweet.created_at),
-                "url": f"https://twitter.com/{tweet.user.screen_name}/status/{tweet.id}",
-                "media": media_urls
+                 "username": tweet.user.screen_name,
+                 "name": tweet.user.name,
+                 "verified": tweet.user.verified,
+                 "profile_image_url": profile_image_url,
+                 "text": cleaned_text,
+                 "tweet_id": getattr(tweet, "id", None),
+                 "created_at": str(tweet.created_at),
+                 "url": f"https://twitter.com/{tweet.user.screen_name}/status/{tweet.id}",
+                 "media": media_urls,
+                 "like_count": getattr(tweet, "favorite_count", 0),
+                 "retweet_count": getattr(tweet, "retweet_count", 0),
+                 "reply_count": getattr(tweet, "reply_count", 0),
+                 "views": getattr(tweet, "view_count", 0)
             })
 
             if len(tweet_data) >= MAX_TWEETS:
@@ -56,6 +65,7 @@ async def run_main(cookie_path):
         await asyncio.sleep(PAGE_FETCH_DELAY)
         tweets = await tweets.next()
 
+    # Save to file
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
         json.dump(tweet_data, f, ensure_ascii=False, indent=2)
 
